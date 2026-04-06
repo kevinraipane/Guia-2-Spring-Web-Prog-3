@@ -67,3 +67,6 @@ Una vez completado el código, deberán probar los endpoints utilizando herramie
 * **Postman** o **Insomnia**.
 * Extensión **REST Client** de VS Code.
 * **Thunder Client**.
+
+## - Pruebas en PostMan
+https://www.postman.com/kevinraipane/workspace/universidad/folder/45517576-921d1f1e-b19b-4afa-b896-b6e6ed727854?action=share&creator=45517576
