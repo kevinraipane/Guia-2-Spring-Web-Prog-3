@@ -49,12 +49,7 @@ public class UserRepository implements IRepository<UserEntity> {
     }
 
     public void update(UserEntity user) {
-        // Recorremos la lista buscando la posición exacta donde el ID coincida
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getId() == user.getId()) {
-                users.set(i, user); // Lo reemplazamos en esa posición
-                return; // Cortamos la ejecución porque ya lo actualizamos
-            }
-        }
+        int index = users.indexOf(user);
+        users.set(index, user);
     }
 }
