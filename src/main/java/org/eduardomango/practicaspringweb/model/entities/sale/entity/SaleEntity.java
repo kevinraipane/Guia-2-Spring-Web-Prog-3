@@ -1,8 +1,10 @@
-package org.eduardomango.practicaspringweb.model.entities;
+package org.eduardomango.practicaspringweb.model.entities.sale.entity;
 
 import java.time.LocalDate;
 
 import lombok.*;
+import org.eduardomango.practicaspringweb.model.entities.user.entity.UserEntity;
+import org.eduardomango.practicaspringweb.model.entities.product.entity.ProductEntity;
 
 @Getter
 @Setter

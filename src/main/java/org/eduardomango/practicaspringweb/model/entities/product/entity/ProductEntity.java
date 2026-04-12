@@ -1,4 +1,4 @@
-package org.eduardomango.practicaspringweb.model.entities;
+package org.eduardomango.practicaspringweb.model.entities.product.entity;
 
 import lombok.*;
 
