@@ -1,10 +1,10 @@
 package org.eduardomango.practicaspringweb.model.controllers;
 
-import org.eduardomango.practicaspringweb.model.dtos.SaleRequest;
-import org.eduardomango.practicaspringweb.model.entities.SaleEntity;
-import org.eduardomango.practicaspringweb.model.exceptions.ProductNotFoundException;
-import org.eduardomango.practicaspringweb.model.exceptions.SaleNotFoundException;
-import org.eduardomango.practicaspringweb.model.exceptions.UserNotFoundException;
+import jakarta.validation.Valid;
+
+import org.eduardomango.practicaspringweb.model.entities.sale.dtos.SaleRequestDTO;
+import org.eduardomango.practicaspringweb.model.entities.sale.dtos.SaleResponseDTO;
+import org.eduardomango.practicaspringweb.model.entities.sale.entity.SaleEntity;
 import org.eduardomango.practicaspringweb.model.services.SaleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,54 +23,64 @@ public class SaleController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SaleEntity>> getAll() {
-        return ResponseEntity.ok(saleService.findAll()); //200
+    public ResponseEntity<List<SaleResponseDTO>> getAll() {
+        List<SaleResponseDTO> response = saleService.findAll().stream()
+                .map(sale -> new SaleResponseDTO(
+                        sale.getId(),
+                        sale.getProducts().getName(),
+                        sale.getClient().getUsername(),
+                        sale.getQuantity(),
+                        sale.getSaleDate()
+                ))
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SaleEntity> getById(@PathVariable long id) {
-        try {
-            SaleEntity sale = saleService.findById(id);
-            return ResponseEntity.ok(sale); //200
-        } catch (SaleNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); //404
-        }
+    public ResponseEntity<SaleResponseDTO> getById(@PathVariable Long id) {
+        SaleEntity sale = saleService.findById(id);
+        return ResponseEntity.ok(new SaleResponseDTO(
+                sale.getId(),
+                sale.getProducts().getName(),
+                sale.getClient().getUsername(),
+                sale.getQuantity(),
+                sale.getSaleDate()
+        ));
     }
 
     @PostMapping
-    public ResponseEntity<SaleEntity> create(@RequestBody SaleRequest saleRequest) {
-        try {
-            SaleEntity newSale = saleService.createSale(
-                    saleRequest.getProductId(),
-                    saleRequest.getUserId(),
-                    saleRequest.getQuantity()
-            );
-            return ResponseEntity.status(HttpStatus.CREATED).body(newSale);
-        } catch (UserNotFoundException | ProductNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); //404 Not Found si fallan las validaciones
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); //400 Bad Request si llega mal
-        }
+    public ResponseEntity<SaleResponseDTO> create(@Valid @RequestBody SaleRequestDTO saleRequest) {
+        SaleEntity newSale = saleService.createSale(
+                saleRequest.getProductId(),
+                saleRequest.getUserId(),
+                saleRequest.getQuantity()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SaleResponseDTO(
+                newSale.getId(),
+                newSale.getProducts().getName(),
+                newSale.getClient().getUsername(),
+                newSale.getQuantity(),
+                newSale.getSaleDate()
+        ));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SaleEntity> update(@PathVariable Long id, @RequestBody SaleRequest saleRequest) {
-        try {
-            SaleEntity updatedSale = saleService.update(id, saleRequest);
-            return ResponseEntity.ok(updatedSale);
-        } catch (SaleNotFoundException | UserNotFoundException | ProductNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<SaleResponseDTO> update(@PathVariable Long id, @Valid @RequestBody SaleRequestDTO saleRequest) {
+        SaleEntity updatedSale = saleService.update(id, saleRequest);
+
+        return ResponseEntity.ok(new SaleResponseDTO(
+                updatedSale.getId(),
+                updatedSale.getProducts().getName(),
+                updatedSale.getClient().getUsername(),
+                updatedSale.getQuantity(),
+                updatedSale.getSaleDate()
+        ));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        try {
-            saleService.delete(id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); //204
-        } catch (SaleNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); //404
-        }
+        saleService.delete(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
 }

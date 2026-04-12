@@ -1,7 +1,10 @@
 package org.eduardomango.practicaspringweb.model.controllers;
 
-import org.eduardomango.practicaspringweb.model.entities.UserEntity;
-import org.eduardomango.practicaspringweb.model.exceptions.UserNotFoundException;
+import jakarta.validation.Valid;
+
+import org.eduardomango.practicaspringweb.model.entities.user.dtos.UserRequestDTO;
+import org.eduardomango.practicaspringweb.model.entities.user.dtos.UserResponseDTO;
+import org.eduardomango.practicaspringweb.model.entities.user.entity.UserEntity;
 import org.eduardomango.practicaspringweb.model.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,79 +15,76 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
     private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    /// ========================== GET ========================== ///
     @GetMapping
-    public ResponseEntity<List<UserEntity>> getAll() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<List<UserResponseDTO>> getAll() {
+        List<UserResponseDTO> response = userService.findAll().stream()
+                .map(u -> new UserResponseDTO(u.getId(), u.getUsername(), u.getEmail()))
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserEntity> getById(@PathVariable long id) {
-        try {
-            return ResponseEntity.ok(userService.findById(id));
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id) {
+        UserEntity user = userService.findById(id);
+        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail()));
     }
 
     @GetMapping("/username/{username}")
-    public ResponseEntity<UserEntity> getByUsername(@PathVariable String username) {
-        try {
-            return ResponseEntity.ok(userService.findByUsername(username)); // 200 OK
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
-        }
+    public ResponseEntity<UserResponseDTO> getByUsername(@PathVariable String username) {
+        UserEntity user = userService.findByUsername(username);
+        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail()));
     }
 
     @GetMapping("/email/{email}")
-    public ResponseEntity<UserEntity> getByEmail(@PathVariable String email) {
-        try {
-            return ResponseEntity.ok(userService.findByEmail(email)); // 200 OK
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
-        }
+    public ResponseEntity<UserResponseDTO> getByEmail(@PathVariable String email) {
+        UserEntity user = userService.findByEmail(email);
+        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail()));
     }
 
-    /// ========================== POST ========================== ///
     @PostMapping
-    public ResponseEntity<UserEntity> create(@RequestBody UserEntity user) {
+    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserRequestDTO requestDTO) {
+        long newId = userService.findAll().stream().mapToLong(UserEntity::getId).max().orElse(0L) + 1;
+
+        UserEntity user = new UserEntity(
+                newId,
+                requestDTO.getUsername(),
+                requestDTO.getEmail(),
+                requestDTO.getPassword()
+        );
         userService.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail()));
     }
 
-    /// ========================== PUT ========================== ///
     @PutMapping("/{id}")
-    public ResponseEntity<UserEntity> update(
-            @PathVariable long id,
-            @RequestBody UserEntity user
-    ) {
-        try {
-            // Validamos que exista antes de actualizar
-            UserEntity existingUser = userService.findById(id);
-            user.setId(existingUser.getId());
-            userService.update(user);
-            return ResponseEntity.ok(user); // 200 cuanda actualiza correctamente
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 si el ID solicitado no existe
-        }
+    public ResponseEntity<UserResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UserRequestDTO requestDTO) {
+        UserEntity existingUser = userService.findById(id);
+
+        existingUser.setUsername(requestDTO.getUsername());
+        existingUser.setEmail(requestDTO.getEmail());
+        existingUser.setPassword(requestDTO.getPassword());
+
+        userService.update(existingUser);
+
+        return ResponseEntity.ok(new UserResponseDTO(
+                existingUser.getId(),
+                existingUser.getUsername(),
+                existingUser.getEmail()
+        ));
     }
 
-    /// ========================== DELETE ========================== ///
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable long id) {
-        try {
-            // Validamos que exista antes de borrar
-            UserEntity user = userService.findById(id);
-            userService.delete(user);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 204 al eliminar con éxito
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404
-        }
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        UserEntity user = userService.findById(id);
+        userService.delete(user);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
