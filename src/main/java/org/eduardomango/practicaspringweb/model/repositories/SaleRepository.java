@@ -4,9 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eduardomango.practicaspringweb.model.entities.ProductEntity;
-import org.eduardomango.practicaspringweb.model.entities.SaleEntity;
-import org.eduardomango.practicaspringweb.model.entities.UserEntity;
+import org.eduardomango.practicaspringweb.model.entities.product.entity.ProductEntity;
+import org.eduardomango.practicaspringweb.model.entities.sale.entity.SaleEntity;
+import org.eduardomango.practicaspringweb.model.entities.user.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,7 +1,7 @@
 package org.eduardomango.practicaspringweb.model.services;
 
 
-import org.eduardomango.practicaspringweb.model.entities.UserEntity;
+import org.eduardomango.practicaspringweb.model.entities.user.entity.UserEntity;
 import org.eduardomango.practicaspringweb.model.exceptions.UserNotFoundException;
 import org.eduardomango.practicaspringweb.model.repositories.IRepository;
 import org.springframework.stereotype.Service;

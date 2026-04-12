@@ -1,10 +1,8 @@
 package org.eduardomango.practicaspringweb.model.services;
 
-import org.eduardomango.practicaspringweb.model.entities.ProductEntity;
+import org.eduardomango.practicaspringweb.model.entities.product.entity.ProductEntity;
 import org.eduardomango.practicaspringweb.model.exceptions.ProductNotFoundException;
-import org.eduardomango.practicaspringweb.model.exceptions.UserNotFoundException;
 import org.eduardomango.practicaspringweb.model.repositories.IRepository;
-import org.eduardomango.practicaspringweb.model.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
