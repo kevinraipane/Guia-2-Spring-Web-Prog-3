@@ -1,16 +1,15 @@
 package org.eduardomango.practicaspringweb.model.services;
 
-import org.eduardomango.practicaspringweb.model.dtos.SaleRequest;
-import org.eduardomango.practicaspringweb.model.entities.ProductEntity;
-import org.eduardomango.practicaspringweb.model.entities.SaleEntity;
-import org.eduardomango.practicaspringweb.model.entities.UserEntity;
+import org.eduardomango.practicaspringweb.model.entities.product.entity.ProductEntity;
+import org.eduardomango.practicaspringweb.model.entities.sale.dtos.SaleRequestDTO;
+import org.eduardomango.practicaspringweb.model.entities.sale.entity.SaleEntity;
+import org.eduardomango.practicaspringweb.model.entities.user.entity.UserEntity;
 import org.eduardomango.practicaspringweb.model.exceptions.SaleNotFoundException;
 import org.eduardomango.practicaspringweb.model.repositories.IRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class SaleService {
@@ -63,7 +62,7 @@ public class SaleService {
     }
 
     /// ============================ UPDATE =========================== ///
-    public SaleEntity update(Long id, SaleRequest request) {
+    public SaleEntity update(Long id, SaleRequestDTO request) {
         //Validamos que la venta a modificar exista
         SaleEntity existingSale = this.findById(id);
 
